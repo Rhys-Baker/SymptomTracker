@@ -259,3 +259,31 @@ button[type="submit"] {
 .backdrop.visible {
     display: block;
 }
+
+
+/* Prevent text selection */
+.no-select {
+    -webkit-touch-callout: none; /* iOS Safari */
+      -webkit-user-select: none; /* Safari */
+       -khtml-user-select: none; /* Konqueror HTML */
+         -moz-user-select: none; /* Old versions of Firefox */
+          -ms-user-select: none; /* Internet Explorer/Edge */
+              user-select: none; /* Non-prefixed version, currently
+                                    supported by Chrome, Edge, Opera and Firefox */
+}
+.text-select {
+    -webkit-touch-callout: text;
+      -webkit-user-select: text;
+       -khtml-user-select: text;
+         -moz-user-select: text;
+          -ms-user-select: text;
+              user-select: text;
+}
+.all-select {
+    -webkit-touch-callout: all;
+      -webkit-user-select: all;
+       -khtml-user-select: all;
+         -moz-user-select: all;
+          -ms-user-select: all;
+              user-select: all;
+}
