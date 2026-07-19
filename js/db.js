@@ -6,6 +6,16 @@ const DB_NAME = "symptom_database";
 const DB_VERSION = 1;
 
 
+// TODO: Move this out of the database file?
+export function dateToString(date){
+    const year = (date.getYear()+1900).toString();
+    const month = (date.getMonth()+1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
+    
+    const datestring = `${year}-${month}-${day}`;
+    
+    return datestring;
+}
 
 /*
     symptom {
@@ -134,6 +144,8 @@ export async function deactivateSymptom(key){
 
     await updateSymptom(symptom.name, symptom.max, false);
 }
+
+
 
 
 

@@ -1,14 +1,5 @@
-import { getActiveSymptoms, getDailyByDate, updateDaily } from "../db.js";
+import { getActiveSymptoms, getDailyByDate, updateDaily, dateToString } from "../db.js";
 
-function dateToString(date){
-    const year = (date.getYear()+1900).toString();
-    const month = (date.getMonth()+1).toString().padStart(2, '0');
-    const day = date.getDate().toString().padStart(2, '0');
-    
-    const datestring = `${year}-${month}-${day}`;
-    
-    return datestring;
-}
 
 export async function showHome() {
 

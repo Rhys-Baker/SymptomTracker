@@ -1,45 +1,45 @@
-import { downloadDB, uploadDB, getAllDailies, importDatabase, getAllSymptoms, getSymptomByKey, getDailyScoreByDate} from "../db.js";
+import { downloadDB, uploadDB, getAllDailies, importDatabase, getAllSymptoms, getSymptomByKey, getDailyScoreByDate, dateToString, getDailyByDate } from "../db.js";
 
 export async function showHistory() {
-
     document.querySelector("#app").innerHTML = `
     <section class="page">
         <form>
             <fieldset>
-                <legend>Daily history</legend>
-                <section id="history">
-                </section>
-            </fieldset>
-            <fieldset>
                 <legend>Calendar</legend>
-                <p id="month-label">Month</p>
-                <div class="calendar">
-                    
-                    <div class="months"></div>
-                    <div class="grid">
-                    </div>
+                
+                <div class="month-header">
+                    <button class="month-btn" id="prev-btn">Prev</button>
+                    <div class="month-label">Month Year</div>
+                    <button class="month-btn" id="next-btn">Next</button>
                 </div>
-                <button id="test-btn">Test</button>
+                <div class="calendar">
+                    <div class="grid"></div>
+                </div>
             </fieldset>
             <button id="export-btn">Export</button>
             <button id="import-btn">Import</button>
             <input type="file" id="import-file" accept=".json">
         </form>
+        <div class="backdrop" id="backdrop"></div>
+        <div class="day-details" id="day-details">
+            <h3>Select a day</h3>
+            <p>Tap a date to view symptoms.</p>
+        </div>
     </section>
     `;
 
-    const historySection = document.querySelector("#history");
     const exportButton = document.querySelector("#export-btn");
-    exportButton.addEventListener("click", downloadDB);
+    
     const importButton = document.querySelector("#import-btn");
     const fileInput = document.querySelector("#import-file");
-    
-    const testButton = document.querySelector("#test-btn");
-    testButton.addEventListener("click", async (event) => {
-        event.preventDefault();
-        const [total, average] = await getDailyScoreByDate("2026-07-17");
-        alert(`Total: ${total}\nAverage: ${average}`);
-    });
+    const monthLabel = document.querySelector(".month-label");
+    const prevButton = document.getElementById("prev-btn");
+    const nextButton = document.getElementById("next-btn");
+
+    const backdrop = document.getElementById("backdrop");
+    const details = document.getElementById("day-details");
+
+    const allSymptoms = await getAllSymptoms();
 
 
     const colors = [
@@ -57,9 +57,102 @@ export async function showHistory() {
         "#800"
     ]
 
-    renderCalendar(2026, 0);
 
-    function renderCalendar(year, month){
+    const now = new Date();
+
+    let currentYear = now.getFullYear();
+    let currentMonth = now.getMonth();
+
+    await renderCalendar(currentYear, currentMonth);
+
+    prevButton.addEventListener("click", async (event) => {
+        event.preventDefault();
+
+        currentMonth--;
+        if(currentMonth < 0){
+            currentMonth = 11;
+            currentYear--;
+        }
+        await renderCalendar(currentYear, currentMonth);
+    });
+    nextButton.addEventListener("click", async (event) => {
+        event.preventDefault();
+
+        currentMonth++;
+        if(currentMonth > 11){
+            currentMonth = 0;
+            currentYear++;
+        }
+        await renderCalendar(currentYear, currentMonth);
+    });
+    
+
+    function populateDayDetails(date, daily){
+        details.innerHTML = ``;
+
+        const header = document.createElement("h3");
+        header.textContent = date.toDateString();
+        details.appendChild(header);
+
+        const section = document.createElement("section");
+        if(!daily){
+            const noContentMessage = document.createElement("p");
+            noContentMessage.textContent = "No content.";
+            section.appendChild(noContentMessage);
+            details.appendChild(section);
+            return;
+        }
+        
+        // "Symptoms:"
+        const symptomsHeader = document.createElement("p");
+        symptomsHeader.textContent = "Symptoms:";
+        section.appendChild(symptomsHeader);
+        const keys = Object.keys(daily.symptoms)
+
+        if(keys.length === 0){
+            const noSymptomsMessage = document.createElement("p");
+            noSymptomsMessage.textContent = "No symptoms.";
+            section.appendChild(noSymptomsMessage);
+        } else {
+            const list = document.createElement("ul");
+            keys.forEach(key => {
+                const li = document.createElement("li");
+                li.textContent = `${allSymptoms.find(element => element.key === key).name}: ${daily.symptoms[key]}`
+                list.appendChild(li);
+            })
+            section.appendChild(list);
+        }
+
+        // Add daily note if it exists
+        if(daily.note !== ""){
+            const noteHeader = document.createElement("p");
+            noteHeader.textContent = "Note:"
+            section.appendChild(noteHeader);
+            const noteContent = document.createElement("p");
+            noteContent.textContent = daily.note;
+            section.appendChild(noteContent);
+        }
+
+
+        details.appendChild(section);
+        return;
+    }
+
+    function showDayDetails(date, daily){
+        populateDayDetails(date, daily);
+        backdrop.classList.add("visible");
+        details.classList.add("visible");
+        
+    }
+
+    function closeDetails() {
+        details.classList.remove("visible");
+        backdrop.classList.remove("visible")
+    }
+
+    backdrop.addEventListener("click", closeDetails);
+
+    async function renderCalendar(year, month){
         // Clear the grid
         const grid = document.querySelector(".grid");
         grid.innerHTML = ``;
@@ -76,11 +169,7 @@ export async function showHistory() {
         // What is the first day of the month?
         const first = new Date(year, month, 1);
         const firstDay = first.getDay();
-
-
         const daysInMonth = new Date(year, month+1, 0).getDate();
-
-        const monthLabel = document.getElementById("month-label");
 
         const monthName = first.toLocaleString('default', {month: 'long'});
         monthLabel.textContent = `${monthName} ${year}`;
@@ -92,26 +181,46 @@ export async function showHistory() {
         for(let i = -firstDay; i < 42-firstDay; i++){
             const cellDate = new Date(year, month, i+1);
 
+            // Get the date key
+            const cellDateKey = dateToString(cellDate);
+            // Find the daily for this date.
+            const daily = await getDailyByDate(cellDateKey);
+            
+
+
+
             const cell = document.createElement("div");
             cell.className = "day";
             cell.textContent = cellDate.getDate();
 
-            // Cell random value
-            const cellRandomValue = Math.floor(Math.random()*colors.length);
+            let cellColorIndex = 0;
+            if(daily !== undefined){
+                cellColorIndex = 1;
+            }
 
             if(i < 0){
-                cell.style.background = mutedColors[cellRandomValue];
+                cell.style.background = mutedColors[cellColorIndex];
             } else if(i >= daysInMonth){
-                cell.style.background = mutedColors[cellRandomValue];
+                cell.style.background = mutedColors[cellColorIndex];
             } else {
-                cell.style.background = colors[cellRandomValue];
-            }            
+                cell.style.background = colors[cellColorIndex];
+            }
+
+            cell.addEventListener("click", () => {
+                showDayDetails(cellDate, daily);
+            });
             
             grid.appendChild(cell);
         }
     }
 
-    importButton.addEventListener("click", async () => {
+    exportButton.addEventListener("click", async (event) => {
+        event.preventDefault();
+        downloadDB();
+    });
+
+    importButton.addEventListener("click", async (event) => {
+        event.preventDefault();
         try {
             const backup = await uploadDB(fileInput);
 
@@ -127,35 +236,9 @@ export async function showHistory() {
         } catch (err){
             console.error(err);
             alert(err.message);
+            return;
         }
     
     });
     
-    const listEl = document.createElement("ul");
-    const symptoms = await getAllSymptoms();
-    const dailies = await getAllDailies();
-    if(!dailies){
-        // TODO: No dailies. Do a message about it
-        return;
-    }
-
-    dailies.forEach((daily) => {
-        const itemEl = document.createElement("li");
-        itemEl.textContent = `${daily.date}`;
-
-        for(const [key, value] of Object.entries(daily.symptoms)){
-            const name = symptoms.find(item => item.key === key)?.name;
-
-            itemEl.textContent += ` | ${name}: ${value}`;
-        }
-
-        if(daily.note){
-            itemEl.textContent += ` | Note: "${daily.note}"`
-        }
-
-        listEl.appendChild(itemEl);
-    });
-
-    historySection.appendChild(listEl);
-
 }
