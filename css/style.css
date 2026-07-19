@@ -166,3 +166,43 @@ button[type="submit"] {
     padding: 12px 20px;
     font-size: 1.5rem;
 }
+
+
+
+/* Calendar heat map */
+.calendar {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+
+    width: fit-content;
+}
+.grid {
+    display: grid;
+
+    grid-template-columns: repeat(7, 1fr);
+
+    gap: 8px;
+}
+.weekday {
+    text-align: center;
+    font-size: 0.8rem;
+    color: #000;
+}
+.day {
+    width: 36px;
+    height: 36px;
+
+    border-radius: 4px;
+    
+    background: #ebedeb;
+
+    transition: background-color 150ms;
+
+    line-height: 36px;
+    text-align: center;
+    
+}
+.day:hover {
+    outline: 3px solid white;
+}

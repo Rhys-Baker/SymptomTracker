@@ -12,8 +12,13 @@ export async function showHistory() {
             </fieldset>
             <fieldset>
                 <legend>Calendar</legend>
-                <section id="calendar">
-                </section>
+                <p id="month-label">Month</p>
+                <div class="calendar">
+                    
+                    <div class="months"></div>
+                    <div class="grid">
+                    </div>
+                </div>
                 <button id="test-btn">Test</button>
             </fieldset>
             <button id="export-btn">Export</button>
@@ -35,6 +40,76 @@ export async function showHistory() {
         const [total, average] = await getDailyScoreByDate("2026-07-17");
         alert(`Total: ${total}\nAverage: ${average}`);
     });
+
+
+    const colors = [
+        "#fff",
+        "#0f0",
+        "#ff0",
+        "#f80",
+        "#f00",
+    ];
+    const mutedColors = [
+        "#888",
+        "#080",
+        "#880",
+        "#840",
+        "#800"
+    ]
+
+    renderCalendar(2026, 0);
+
+    function renderCalendar(year, month){
+        // Clear the grid
+        const grid = document.querySelector(".grid");
+        grid.innerHTML = ``;
+        
+        // Render the weekday names
+        for(const weekday of ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]){
+            const wd = document.createElement("div");
+            wd.className = "weekday";
+            wd.textContent = weekday;
+            grid.appendChild(wd);
+        }
+        
+        
+        // What is the first day of the month?
+        const first = new Date(year, month, 1);
+        const firstDay = first.getDay();
+
+
+        const daysInMonth = new Date(year, month+1, 0).getDate();
+
+        const monthLabel = document.getElementById("month-label");
+
+        const monthName = first.toLocaleString('default', {month: 'long'});
+        monthLabel.textContent = `${monthName} ${year}`;
+
+        
+        // Render 7*6 (42) cells
+
+        // Iterate over all days on this calendar page.
+        for(let i = -firstDay; i < 42-firstDay; i++){
+            const cellDate = new Date(year, month, i+1);
+
+            const cell = document.createElement("div");
+            cell.className = "day";
+            cell.textContent = cellDate.getDate();
+
+            // Cell random value
+            const cellRandomValue = Math.floor(Math.random()*colors.length);
+
+            if(i < 0){
+                cell.style.background = mutedColors[cellRandomValue];
+            } else if(i >= daysInMonth){
+                cell.style.background = mutedColors[cellRandomValue];
+            } else {
+                cell.style.background = colors[cellRandomValue];
+            }            
+            
+            grid.appendChild(cell);
+        }
+    }
 
     importButton.addEventListener("click", async () => {
         try {
