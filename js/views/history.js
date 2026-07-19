@@ -89,6 +89,7 @@ export async function showHistory() {
 
     function populateDayDetails(date, daily){
         details.innerHTML = ``;
+        details.classList.add("text-select");
 
         const header = document.createElement("h3");
         header.textContent = date.toDateString();
