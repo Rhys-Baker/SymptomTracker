@@ -294,6 +294,12 @@ button[type="submit"] {
 }
 
 .version-tag {
+    position: fixed;
+
+    left: 0;
+    right: 0;
+    bottom: 1rem;
+
     text-align: center;
     justify-content: center;
     color: #aaa;

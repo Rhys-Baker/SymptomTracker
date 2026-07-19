@@ -20,11 +20,13 @@ export async function showHistory() {
             <button id="import-btn">Import</button>
             <input type="file" id="import-file" accept=".json">
         </form>
+        <p id="version-tag" class="version-tag">Version: UNKNOWN</p>
         <div class="backdrop" id="backdrop"></div>
         <div class="day-details" id="day-details">
             <h3>Select a day</h3>
             <p>Tap a date to view symptoms.</p>
         </div>
+        
     </section>
     `;
 
@@ -41,10 +43,22 @@ export async function showHistory() {
 
     const allSymptoms = await getAllSymptoms();
 
+    // Get the current app version
+    const versionTag = document.getElementById("version-tag");
+    navigator.serviceWorker.controller?.postMessage({
+        type: "GET_VERSION"
+    });
+    navigator.serviceWorker.addEventListener("message", (event) => {
+        if(event.data.type === "VERSION") {
+            console.log(event.data.version);
+            versionTag.textContent = `Version: ${event.data.version}`;
+        }
+    })
+
 
     const colors = [
         "#fff",
-        "#0f0",
+        "#0ff",
         "#ff0",
         "#f80",
         "#f00",

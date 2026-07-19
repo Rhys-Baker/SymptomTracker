@@ -1,10 +1,8 @@
-const VERSION = "v1";
-const CACHE_NAME = `symptom-tracker-${VERSION}`;
+const APP_VERSION = "v1";
+const CACHE_NAME = `symptom-tracker-${APP_VERSION}`;
 
 const APP_STATIC_RESOURCES = [
-    "/",
     "/index.html",
-    "/sw.js",
     "/js/app.js",
     "/js/router.js",
     "/js/db.js",
@@ -16,20 +14,20 @@ const APP_STATIC_RESOURCES = [
     "/manifest.json"
 ];
 
-self.addEventListener("install", (e) => {
-    e.waitUntil(
-        (async () => {
-            const cache = await caches.open(CACHE_NAME);
-            for (const url of APP_STATIC_RESOURCES) {
-                try {
-                    console.log("Caching", url);
-                    await cache.add(url);
-                } catch (err) {
-                    console.error("Failed:", url, err);
+self.addEventListener("install", event => {
+    event.waitUntil(
+        caches.open(CACHE_NAME)
+            .then(async cache => {
+                for (const url of APP_STATIC_RESOURCES) {
+                    const request = new Request(
+                        new URL(url, self.location.origin)
+                    );
+                    const response = await fetch(request);
+
+                    await cache.put(request, response);
                 }
-            }
-            await self.skipWaiting();
-        })(),
+            })
+            .then(() => self.skipWaiting())
     );
 });
 
@@ -43,30 +41,56 @@ self.addEventListener("activate", (event) => {
                     .map(key => caches.delete(key))
             );
             await clients.claim();
-        })(),
+
+            // Tell index.html to refresh the page
+            const clientsList = await clients.matchAll();
+            for (const client of clientsList) {
+                client.postMessage({
+                    type: "UPDATED"
+                });
+            }
+
+        })()
     );
 });
 
 self.addEventListener("fetch", (event) => {
-    // When seeking an HTML page
-    if (event.request.mode === "navigate") {
-        // Return to the index.html page
-        event.respondWith(caches.match("/"));
+    const url = new URL(event.request.url);
+    if (url.origin !== self.location.origin) {
         return;
     }
 
-    // For every other request type
+    if (event.request.mode === "navigate") {
+        event.respondWith(
+            caches.match("/index.html")
+                .then(response => {
+                    return response;
+                })
+        );
+        return;
+    }
+
+    
     event.respondWith(
-        (async () => {
-            const cache = await caches.open(CACHE_NAME);
-            const cachedResponse = await cache.match(event.request.url);
-            if (cachedResponse) {
-                // Return the caches response if it's available
-                return cachedResponse;
-            }
-            console.error(`Failed to fetch required file: ${event.request.url}. Preventing load.`);
-            // Respond with an HTTP 404 response status.
-            return new Response(null, { status: 404 });
-        })(),
+        caches.match(event.request, { ignoreVary: true })
+            .then(response => {
+                if (response) {
+                    return response;
+                }
+
+                return new Response("Offline", {
+                    status: 503,
+                    statusText: "Offline"
+                });
+            })
     );
+});
+
+self.addEventListener("message", (event) => {
+    if(event.data?.type === "GET_VERSION") {
+        event.source?.postMessage({
+            type: "VERSION",
+            version: CACHE_NAME
+        });
+    }
 });
