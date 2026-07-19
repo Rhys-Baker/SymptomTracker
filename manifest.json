@@ -1,0 +1,15 @@
+{
+    "name": "SymptomTracker: Symptom Tracking app",
+    "short_name": "SymptomTracker",
+    "theme_color": "#608860",
+    "background_color": "#9be09b",
+    "start_url": "./",
+    "display": "standalone",
+
+    "icons": [
+        {
+            "src": "icon-512.png",
+            "sizes": "512x512"
+        }
+    ]
+}

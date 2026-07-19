@@ -1,0 +1,168 @@
+html,
+body {
+    margin: 0;
+    height: 100%;
+    overscroll-behavior: none; /* Backup option */
+}
+
+html {
+    background-color: #608860;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100dvh;
+    
+    padding-top: env(safe-area-inset-top); /* iOS-specific "safe area" for safari*/
+}
+
+nav {
+    height: 60px;
+
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+
+    background: #608860;
+}
+
+main {
+    flex: 1;
+    overflow-y: auto;
+    background: #9be09b;
+}
+
+fieldset {
+    background-color: #8cc98c;
+    border: 4px dotted #384c38;
+    margin: 2px;
+}
+
+legend {
+    background-color: #caefc8;
+    border: 2px solid #384c38;
+    font-weight: 1000;
+    font-size: large;
+}
+
+button {
+    min-height: 44px;
+    font-family: inherit;
+    font-size: 1rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 0;
+    padding: 12px 20px;
+    background-color: #608860;;
+    color: white;
+    cursor: pointer;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+button:active {
+    transform: scale(0.97);
+}
+
+input[type="text"],
+input[type="number"],
+input[type="date"],
+input[type="file"]
+{
+    padding: 12px 20px;
+}
+
+.page {
+    display: flex;
+    flex-direction: column;
+    
+    min-height: 100%;
+    padding: 16px;
+
+    box-sizing: border-box;
+    gap: 16px;
+}
+.stack {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.grow {
+    flex: 1
+}
+.center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.fill {
+    display: flex;
+    flex: 1;
+    width: 100%;
+    height: 100%;
+
+}
+
+.daily-form {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+#daily-fieldset {
+    display: flex;
+    flex-direction: column;
+}
+
+#symptom-inputs {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+#daily-note {
+    resize: none;
+}
+
+.nav-button {
+    display: flex;
+    flex: 3;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+    
+    border: 0;
+    border-radius: 0;
+
+    background-color: #608860;
+    color: white;
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+.nav-button:hover {    
+    background-color: #567956;
+}
+.nav-button:active {    
+    background-color: #436043;
+}
+
+.symptom-row {
+    display: flex;
+}
+.symptom-label {
+    flex-direction: row;
+    flex: 2
+}
+.symptom-input {
+    display: flex;
+    flex-direction: row;
+}
+
+button[type="submit"] {
+    align-self: stretch;
+    padding: 12px 20px;
+    font-size: 1.5rem;
+}
