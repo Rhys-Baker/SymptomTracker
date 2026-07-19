@@ -2,7 +2,7 @@ html,
 body {
     margin: 0;
     height: 100%;
-    overscroll-behavior: none; /* Backup option */
+    overscroll-behavior: none;
 }
 
 html {
@@ -234,16 +234,21 @@ button[type="submit"] {
 
 .day-details {
     position: fixed;
+
     left: 0;
     right: 0;
     bottom: 0;
 
+    max-height: 70vh;
+    overflow-y: auto;
+
     padding: 1.5rem;
+    padding-bottom: calc(1.5rem + env(safe-area-inset-bottom));
     background-color: white;
     border-radius: 20px 20px 0 0;
 
     transform: translateY(100%);
-    transition: transform 200ms;
+    transition: transform 250ms ease-out;
 }
 .day-details.visible {
     transform: translateY(0);
@@ -286,4 +291,10 @@ button[type="submit"] {
          -moz-user-select: all;
           -ms-user-select: all;
               user-select: all;
+}
+
+.version-tag {
+    text-align: center;
+    justify-content: center;
+    color: #aaa;
 }
