@@ -58,7 +58,7 @@ export async function showHistory() {
 
     const colors = [
         "#fff",
-        "#0ff",
+        "#0f0",
         "#ff0",
         "#f80",
         "#f00",
