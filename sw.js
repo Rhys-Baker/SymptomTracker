@@ -1,4 +1,4 @@
-const APP_VERSION = "v2";
+const APP_VERSION = "v3";
 const CACHE_NAME = `symptom-tracker-${APP_VERSION}`;
 
 const APP_STATIC_RESOURCES = [
