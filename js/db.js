@@ -110,7 +110,7 @@ function normaliseName(name){
 export async function updateSymptom(name, max, active){
     const db = await getDB();
 
-    console.log(`Updating ${name}: Active: ${active?"yes":"no"}`);
+    //console.log(`Updating ${name}: Active: ${active?"yes":"no"}`);
 
     const key = normaliseName(name);
     const symptom = {"key": key, "name": name, "max": max, "active": active};
