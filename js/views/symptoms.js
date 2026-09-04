@@ -71,14 +71,17 @@ async function renderSymptoms() {
 
     symptoms.forEach(s => {
         const li = document.createElement("li");
+        li.setAttribute("class", "symptom-item");
 
         li.innerHTML = `
-        <span>
-            ${s.name} (max: ${s.max} | ${s.active ? "Active" : "Inactive"})
-        </span>
-        <button class="toggle-btn">
-            ${s.active ? "Deactivate" : "Activate"}
-        </button>
+        <div class="symptom-item-content">
+            <span>
+                ${s.name} (max: ${s.max} | ${s.active ? "Active" : "Inactive"})
+            </span>
+            <button class="toggle-btn">
+                ${ s.active ? "Deactivate" : "Activate" }
+            </button>
+        </div>
         `;
 
         const button = li.querySelector(".toggle-btn");

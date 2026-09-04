@@ -129,6 +129,12 @@ input[type="file"]
     height: 100%;
 }
 
+li.symptom-li {
+    display: flex;
+    flex-direction: column;
+    width: 90%;
+}
+
 #daily-note {
     resize: none;
 }
@@ -174,6 +180,16 @@ button[type="submit"] {
     text-align: center;
     padding: 12px 20px;
     font-size: 1.5rem;
+}
+
+button.toggle-btn {
+    justify-self: right;
+    width: 13ch;
+}
+div.symptom-item-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 
